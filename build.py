@@ -37,7 +37,8 @@ class Builder(QtWidgets.QDialog):
         self.setWindowTitle("Builder")
         self.setWindowIcon(QtGui.QIcon("package.png"))
 
-        main_layout.addWidget(QtWidgets.QLabel("Select a houdini python tool project to build:"))
+        main_layout.addWidget(QtWidgets.QLabel(("Select a houdini python "
+                                                "tool project to build:")))
 
         for i, prj in enumerate(list_of_proj):
 
@@ -52,16 +53,14 @@ class Builder(QtWidgets.QDialog):
         self.proj_selected = idx
         self.close()
 
-
-
-
 def main():
 
     root = os.path.dirname(os.getcwd())
     print("ROOT: " + root)
     
     projects = [d for d in os.listdir(root) if not d.startswith('.') \
-                and os.path.isdir(root + os.sep + d)]
+                and os.path.isdir(root + os.sep + d) \
+                and d != "HoudiniToolsBuilds"]
     
     app = QtWidgets.QApplication(sys.argv)
     w = Builder(projects)
