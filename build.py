@@ -1,5 +1,12 @@
 import os
+import sys
 import shutil
+import qdarkstyle
+
+from PyQt5 import QtGui
+from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+Qt = QtCore.Qt
 
 INSTALL_HEADER = """
 Extract %BUILD% to $HOME/houdini16.0/ folder ( or your current version of Houdini ).
@@ -19,6 +26,34 @@ contact@cgtoolbox.com
 
 IGNORE_PATTERN = ["*.pyc"]
 
+class Builder(QtWidgets.QDialog):
+
+    def __init__(self, list_of_proj, parent=None):
+        super(Builder, self).__init__(parent=parent)
+
+        self.proj_selected = -1
+
+        main_layout = QtWidgets.QVBoxLayout()
+        self.setWindowTitle("Builder")
+        self.setWindowIcon(QtGui.QIcon("package.png"))
+
+        main_layout.addWidget(QtWidgets.QLabel("Select a houdini python tool project to build:"))
+
+        for i, prj in enumerate(list_of_proj):
+
+            btn = QtWidgets.QPushButton(prj)
+            btn.clicked.connect(lambda state, x=i: self.select_proj(x))
+            main_layout.addWidget(btn)
+
+        self.setLayout(main_layout)
+
+    def select_proj(self, idx):
+
+        self.proj_selected = idx
+        self.close()
+
+
+
 
 def main():
 
@@ -27,23 +62,14 @@ def main():
     
     projects = [d for d in os.listdir(root) if not d.startswith('.') \
                 and os.path.isdir(root + os.sep + d)]
-
-    print("Build:")
-    print("-------")
-    for i, proj in enumerate(projects):
-        print("[{}] {}".format(i, proj))
-    print("-------")
-
-    p = input("Enter ID:")
     
-    try:
-        p = int(p)
-    except:
-        print("Invalid ID")
-        return
-    
-    if p < 0 or p > len(projects):
-        print("Invalid ID")
+    app = QtWidgets.QApplication(sys.argv)
+    w = Builder(projects)
+    w.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    w.exec_()
+
+    p = w.proj_selected
+    if p == -1:
         return
 
     project = projects[p]
