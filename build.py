@@ -17,6 +17,8 @@ www.cgtoolbox.com
 contact@cgtoolbox.com
 """
 
+IGNORE_PATTERN = ["*.pyc"]
+
 
 def main():
 
@@ -96,6 +98,9 @@ def main():
 
         if os.path.isfile(src_file):
             
+            if "*." + src_file.split('.')[-1] in IGNORE_PATTERN:
+                continue
+
             print("Copying file: " + src_file)
 
             if not os.path.exists(tgt_folder):
@@ -107,7 +112,8 @@ def main():
         elif os.path.isdir(src_file):
 
             print("Copying folder: " + src_file)
-            shutil.copytree(src_file, tgt_folder)
+            shutil.copytree(src_file, tgt_folder,
+                            ignore=shutil.ignore_patterns(*IGNORE_PATTERN))
 
         else:
             print("File: {} not valid.".format(src_file))
