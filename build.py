@@ -88,13 +88,29 @@ def main():
         print("No build name $NAME found.")
         return
 
+    build_name = build_name[0].split(':')[-1].replace('\n', '')
+    print("Build name: " + build_name)
+
     doc_link = ""
     doc_link_raw = [d for d in build_data if d.startswith("$DOC_LINK")]
     if doc_link_raw:
         doc_link = doc_link_raw[0].split(':')[-1]
 
-    build_name = build_name[0].split(':')[-1].replace('\n', '')
-    print("Build name: " + build_name)
+    version = ""
+    version_raw = [d for d in build_data if d.startswith("$VERSION")]
+    if version_raw:
+        version_file = root + '/' + build_name + '/' + version_raw[0].split(':')[-1]
+        version_file = version_file.replace('\n', '')
+        if os.path.exists(version_file):
+            with open(version_file, 'r') as f:
+                for li in f.readlines():
+                    if li.startswith("__version__"):
+                        version = li.split('=')[-1].strip().replace('.', '_')
+                        version = '_v' + version.replace('"', '')
+                        print("Code version: " + version)
+                        break
+    if version == "":
+        print("Node code version found")
     
     target = os.path.join(root, "HoudiniToolsBuilds", build_name)
     if not os.path.exists(target):
@@ -154,7 +170,7 @@ def main():
     with open(install_info, 'w') as f:
         f.write(install_data)
 
-    archive = os.path.join(root, "HoudiniToolsBuilds", "builds", build_name)
+    archive = os.path.join(root, "HoudiniToolsBuilds", "builds", build_name + version)
 
     print("Creating archive: " + archive)
     shutil.make_archive(archive, "zip", target)
@@ -162,7 +178,7 @@ def main():
     print("Cleaning build folder: " + target)
     shutil.rmtree(target)
 
-    print("Build created successfully.")
+    print("Build created successfully: " + archive)
 
 if __name__ == "__main__":
     main()
