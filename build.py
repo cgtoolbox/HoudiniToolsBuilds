@@ -60,7 +60,8 @@ def main():
     
     projects = [d for d in os.listdir(root) if not d.startswith('.') \
                 and os.path.isdir(root + os.sep + d) \
-                and d != "HoudiniToolsBuilds"]
+                and d != "HoudiniToolsBuilds" \
+                and d != "Backup"]
     
     app = QtWidgets.QApplication(sys.argv)
     w = Builder(projects)
